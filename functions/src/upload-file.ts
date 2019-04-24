@@ -15,7 +15,7 @@ exports.uploadfile =
 
                 // Create meta data.
                 const fileMeta = {
-                    lastmodified: object.updated,
+                    lastModified: object.updated,
                     name: object.metadata.originalName,
                     type: type.file,
                     size: object.size
