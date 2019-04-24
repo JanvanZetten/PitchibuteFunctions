@@ -1,4 +1,14 @@
-import * as functions from 'firebase-functions';
+//import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
+import * as fileDownload from './file-download';
+
+admin.initializeApp();
+
+module.exports = {
+    ...fileDownload
+}
+
+
 
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
