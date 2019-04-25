@@ -1,12 +1,18 @@
-//import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as fileDownload from './file-download';
 
-admin.initializeApp();
+const path = require("path");
+const serviceAccount = path.resolve(__dirname, 'serviceaccount.json');
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://pitchibute.firebaseio.com",
+    storageBucket: "gs://pitchibute.appspot.com.appspot.com"
+});
 
 module.exports = {
     ...fileDownload
-}
+};
 
 
 

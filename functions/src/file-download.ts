@@ -6,7 +6,18 @@ exports.TestFunction = functions.https.onRequest((request, response) => {
 });
 
 exports.DownloadTest = functions.https.onRequest((req, res) => {
-   return admin.firestore().collection('test').doc('Project Charter Template.pdf')
 
+    const bucketvar = admin.storage().bucket('gs://pitchibute.appspot.com/test');
+    const myFile = bucketvar.file('/pkaFile.pka').createWriteStream()
+        .on('err', (err) => {
+            throw err;
+        });
+    console.log(myFile);
+
+    res.contentType('application/octet-stream');
+    res.pipe(myFile);
+
+    /*myFile.getSignedUrl({action: 'read', expires: '03-09-2491'}).then(urls => {
+        res.send(urls[0]);
+    }).catch(err => {console.log(err)});*/
 });
-

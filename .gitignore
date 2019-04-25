@@ -141,3 +141,9 @@ fabric.properties
 
 # Sonarlint plugin
 .idea/sonarlint
+.idea/misc.xml
+.idea/modules.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/PitchibuteFunctions.iml
+.idea/vcs.xml
+package-lock.json
