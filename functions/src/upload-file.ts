@@ -1,8 +1,9 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
+// should be the same as web apps item type.
 enum type {
-    file
+    group, event, folder, file, link
 }
 
 /*
