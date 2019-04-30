@@ -493,3 +493,9 @@ fabric.properties
 .idea/sonarlint
 
 # End of https://www.gitignore.io/api/visualstudio
+package-lock.json
+.idea/inspectionProfiles/Project_Default.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/PitchibuteFunctions.iml
+.idea/vcs.xml
