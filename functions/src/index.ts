@@ -1,8 +1,8 @@
-import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
+import * as uploadFile from './upload-file';
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
+admin.initializeApp();
+
+module.exports = {
+    ...uploadFile
+}
