@@ -14,7 +14,7 @@ admin.initializeApp({
 
 module.exports = {
     ...uploadFile,
-    ...addUserGroup
+    ...addUserGroup,
     ...testDownloadFile,
     ...uploadFile
 };
