@@ -1,20 +1,30 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
+exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
 
-
-exports.addUserToGroup  = functions.https.onRequest(async (req, res) => {
 
     const data = req.body;
+    const email = data.email;
     const collection = data.collection;
     const doc = data.doc;
     const users = data.users;
+    let userId = '';
     // Check if collection, doc are not empty and that user list is defined.
-    if(collection && doc && users)
-    {
-        // Adding the newly added user.
-        users.push(data.user);
+    if (collection && doc && users && email) {
         try {
+            // Retrieving the data about the user, to get the user-id.
+            // Await so we wont go further with code until we get the data.
+             await admin.auth().getUserByEmail(email).then( userData => {
+                userId = userData.uid;
+            }).catch(error => {
+                console.log(error.message);
+                throw error;
+            });
+
+            users.push(userId);
+
+            // Merging data.(adding new user)
             admin.firestore().collection(collection).doc(doc).set({
                     users: users
                 },
@@ -24,13 +34,10 @@ exports.addUserToGroup  = functions.https.onRequest(async (req, res) => {
                 throw error;
             });
             res.send('User was successfully added');
-        }
-        catch(error) {
+        } catch (error) {
             res.send('Something unexpected happened. Error.')
         }
-    }
-    else
-    {
+    } else {
         res.send('Missing parameters.')
     }
 });
