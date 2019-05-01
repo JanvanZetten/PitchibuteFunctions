@@ -1,5 +1,6 @@
 import * as admin from 'firebase-admin';
 import * as uploadFile from './upload-file';
+import * as addUserGroup from './add-user-group'
 import * as testDownloadFile from './test-download-file';
 
 // Fetch the service account key JSON file contents
@@ -12,6 +13,8 @@ admin.initializeApp({
 });
 
 module.exports = {
+    ...uploadFile,
+    ...addUserGroup
     ...testDownloadFile,
     ...uploadFile
-}
+};
