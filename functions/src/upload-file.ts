@@ -22,11 +22,22 @@ exports.uploadfile =
                     size: object.size
                 };
 
+                const path = object.metadata.path
+                const docIds = path.split('/')
+
+                var collection = admin.firestore().collection('items')
+
+                docIds.forEach(docId => {
+                    if (docId !== '') {
+                        collection = collection.doc(docId).collection('items')
+                    }
+                })
+
                 // Get the id of the generated file to save the document as.
                 const nameForDoc = object.name.split('/')[1];
 
                 // Save the document to firestore in files collection.
-                admin.firestore().collection('files')
+                collection
                     .doc(nameForDoc)
                     .set(fileMeta)
                     .then(value => resolve(value))
