@@ -25,11 +25,13 @@ exports.uploadfile =
                 const path = object.metadata.path
                 const docIds = path.split('/')
 
-                var collection = admin.firestore().collection('items')
+                const ITEMS = 'items'
+
+                var collection = admin.firestore().collection(ITEMS)
 
                 docIds.forEach(docId => {
                     if (docId !== '') {
-                        collection = collection.doc(docId).collection('items')
+                        collection = collection.doc(docId).collection(ITEMS)
                     }
                 })
 
