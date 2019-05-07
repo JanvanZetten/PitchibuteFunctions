@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import * as uploadFile from './upload-file';
 import * as addUserGroup from './add-user-group'
 import * as testDownloadFile from './test-download-file';
+import * as logCreate from './log-create';
 
 // Fetch the service account key JSON file contents
 const serviceAccount = require("../pitchibute-5171e0a0103b.json");
@@ -16,5 +17,6 @@ module.exports = {
     ...uploadFile,
     ...addUserGroup,
     ...testDownloadFile,
-    ...uploadFile
+    ...uploadFile,
+    ...logCreate
 };
