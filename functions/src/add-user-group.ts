@@ -65,7 +65,7 @@ exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
                 .then(token => {
                     decodedUserUid = token.uid;
                 }).catch(error => {
-                    throw error;
+                    throw new CustomError('You are not authorized to do this', 401);
                 });
 
             await getUserByEmail(email).then(userData => {
