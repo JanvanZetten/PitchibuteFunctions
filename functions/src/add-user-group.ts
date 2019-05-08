@@ -11,7 +11,8 @@ function addNewUser(collection: string, doc: string, users: []) {
         {merge: true}
     ).catch(error => {
         console.log(error);
-        throw new CustomError('Could not add user to the group, contact administrator team.');
+        throw new CustomError('Could not add user to the group, contact administrator team.',
+            400);
     });
 }
 
@@ -21,7 +22,7 @@ function apartOfGroup(users: [], userId: string, decodedUserUid: string) {
         // @ts-ignore
         users.push(userId);
     } else {
-        throw new CustomError('You are not authorized to do that.');
+        throw new CustomError('You are not authorized to do that.', 403);
     }
 }
 
@@ -62,7 +63,7 @@ exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
             await auth.verifyToken(tokenForDecode)
             // @ts-ignore
                 .then(token => {
-                        decodedUserUid = token.uid;
+                    decodedUserUid = token.uid;
                 }).catch(error => {
                     throw error;
                 });
@@ -71,30 +72,27 @@ exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
                 userId = userData.uid;
             }).catch(error => {
                 console.log(error.message);
-                throw new CustomError('User with the email ' + email + ' was not found.');
+                throw new CustomError('User with the email ' + email + ' was not found.', 404);
             });
 
             await getDocument(doc).then(snapShot => {
                 // @ts-ignore
                 users = snapShot.data().users;
-                if (!users) {
-                    throw new CustomError('Group was not found')
-                }
             }).catch(error => {
                 console.log(error.message);
-                throw error;
+                throw new CustomError('Invalid group', 404);
             });
 
             // Checking if the one adding a user is himself apart of group.
             apartOfGroup(users, userId, decodedUserUid);
 
             addNewUser(collection, doc, users);
-            res.send('User was successfully added');
+            res.status(200).send('User was successfully added');
         } catch (error) {
             if (error instanceof CustomError) {
-                res.send(error.message);
+                res.status(error.errorStatus).send(error.message);
             } else {
-                res.send('Something unexpected happened. Contact the administrator team' + error.message)
+                res.send('Something unexpected happened. Contact the administrator team')
             }
         }
     } else {
