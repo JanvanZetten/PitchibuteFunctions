@@ -8,7 +8,7 @@ export class Authorization {
     static validateFirebaseIdToken(req: Request, res:Response) {
         // @ts-ignore
         if(!req.get('Authorization') || !req.get('Authorization').startsWith('Bearer ')) {
-            res.status(403).send('Unauthorized');
+            res.status(403).send('Missing authorization header');
             return;
         }
     };
