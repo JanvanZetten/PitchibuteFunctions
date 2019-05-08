@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import {CustomError} from "./CustomError";
+import {Authorization as auth} from "./authorization";
 
 function addNewUser(collection: string, doc: string, users: []) {
     // Merging data.(adding new user)
@@ -10,7 +11,7 @@ function addNewUser(collection: string, doc: string, users: []) {
         {merge: true}
     ).catch(error => {
         console.log(error);
-        throw error;
+        throw new CustomError('Could not add user to the group, contact administrator team.');
     });
 }
 
@@ -37,6 +38,8 @@ function getDocument(doc: string) {
 
 exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
 
+    // Checking if user has a token for auth.
+    auth.validateFirebaseIdToken(req, res);
 
     const data = req.body;
     const email = data.email;
@@ -51,24 +54,32 @@ exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
     // Check if collection, doc and email are not empty.
     if (collection && doc && email) {
         try {
+            let tokenForDecode = req.get('Authorization');
+            // @ts-ignore
+            tokenForDecode = tokenForDecode.split('Bearer ')[1];
             // Decoding the token in order to get uid.
             // @ts-ignore
-            await admin.auth().verifyIdToken(req.get('Authorization'))
+            await auth.verifyToken(tokenForDecode)
             // @ts-ignore
                 .then(token => {
-                    decodedUserUid = token.uid;
+                        decodedUserUid = token.uid;
+                }).catch(error => {
+                    throw error;
                 });
 
             await getUserByEmail(email).then(userData => {
                 userId = userData.uid;
             }).catch(error => {
                 console.log(error.message);
-                throw error;
+                throw new CustomError('User with the email ' + email + ' was not found.');
             });
 
             await getDocument(doc).then(snapShot => {
                 // @ts-ignore
                 users = snapShot.data().users;
+                if (!users) {
+                    throw new CustomError('Group was not found')
+                }
             }).catch(error => {
                 console.log(error.message);
                 throw error;
@@ -83,7 +94,7 @@ exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
             if (error instanceof CustomError) {
                 res.send(error.message);
             } else {
-                res.send('Something unexpected happened. Contact the administrator team')
+                res.send('Something unexpected happened. Contact the administrator team' + error.message)
             }
         }
     } else {
