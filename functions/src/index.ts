@@ -1,10 +1,10 @@
 import * as admin from 'firebase-admin';
 import * as uploadFile from './upload-file';
-import * as hierachygetter from './hierachy-getter';
+import * as getPathItems from './getPathItems';
 
 admin.initializeApp();
 
 module.exports = {
     ...uploadFile,
-    ...hierachygetter
+    ...getPathItems
 }
