@@ -35,7 +35,7 @@ function getUserByEmail(email: string) {
     return admin.auth().getUserByEmail(email);
 }
 
-function getDocument(collection:string, doc: string) {
+function getDocument(collection: string, doc: string) {
     return admin.firestore().collection(collection).doc(doc).get();
 }
 
