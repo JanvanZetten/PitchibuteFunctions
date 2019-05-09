@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import {CustomError} from "./CustomError";
+import {Authorization as auth} from "./authorization";
 
 function addNewUser(collection: string, doc: string, users: []) {
     // Merging data.(adding new user)
@@ -10,7 +11,8 @@ function addNewUser(collection: string, doc: string, users: []) {
         {merge: true}
     ).catch(error => {
         console.log(error);
-        throw error;
+        throw new CustomError('Could not add user to the group, contact administrator team.',
+            400);
     });
 }
 
@@ -20,7 +22,7 @@ function apartOfGroup(users: [], userId: string, decodedUserUid: string) {
         // @ts-ignore
         users.push(userId);
     } else {
-        throw new CustomError('You are not authorized to do that.');
+        throw new CustomError('You are not authorized to do that.', 403);
     }
 }
 
@@ -37,6 +39,8 @@ function getDocument(doc: string) {
 
 exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
 
+    // Checking if user has a token for auth.
+    auth.validateFirebaseIdToken(req, res);
 
     const data = req.body;
     const email = data.email;
@@ -51,19 +55,24 @@ exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
     // Check if collection, doc and email are not empty.
     if (collection && doc && email) {
         try {
+            let tokenForDecode = req.get('Authorization');
+            // @ts-ignore
+            tokenForDecode = tokenForDecode.split('Bearer ')[1];
             // Decoding the token in order to get uid.
             // @ts-ignore
-            await admin.auth().verifyIdToken(req.get('Authorization'))
+            await auth.verifyToken(tokenForDecode)
             // @ts-ignore
                 .then(token => {
                     decodedUserUid = token.uid;
+                }).catch(error => {
+                    throw new CustomError('You are not authorized to do this', 401);
                 });
 
             await getUserByEmail(email).then(userData => {
                 userId = userData.uid;
             }).catch(error => {
                 console.log(error.message);
-                throw error;
+                throw new CustomError('User with the email ' + email + ' was not found.', 404);
             });
 
             await getDocument(doc).then(snapShot => {
@@ -71,17 +80,17 @@ exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
                 users = snapShot.data().users;
             }).catch(error => {
                 console.log(error.message);
-                throw error;
+                throw new CustomError('Invalid group', 404);
             });
 
             // Checking if the one adding a user is himself apart of group.
             apartOfGroup(users, userId, decodedUserUid);
 
             addNewUser(collection, doc, users);
-            res.send('User was successfully added');
+            res.status(200).send('User was successfully added');
         } catch (error) {
             if (error instanceof CustomError) {
-                res.send(error.message);
+                res.status(error.errorStatus).send(error.message);
             } else {
                 res.send('Something unexpected happened. Contact the administrator team')
             }
