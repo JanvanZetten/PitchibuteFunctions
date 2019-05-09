@@ -1,33 +1,39 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import * as corsModule from 'cors';
 
-/*const cors = corsModule(
-    {origin:true})*/
+const corsHandler = corsModule({origin: true});
 
+exports.getPathItems = functions.https.onRequest((request, response) => {
+    
+    corsHandler(request, response, () => {
+        if (request.method === 'GET') {
+            /*const params = request.headers['uid'];*/
+            const path = request.headers['path'];
+            // @ts-ignore
+            const token = request.headers['authorization'];
 
-exports.getMainGroups = functions.https.onRequest((request, response) => {
+            // @ts-ignore
+            admin.firestore().collection(path.toString())
+            /*.where('users', 'array-contains', params)*/
+                .get().then(items => {
+                const listOfItems: any = [];
+                items.forEach(item => {
+                    const i = {
+                        id: item.id,
+                        ...item.data()
+                    };
+                    listOfItems.push(i);
+                })
+                response.json(listOfItems);
+            }).catch(err => {console.log(err)})
+        } else {
+            console.log('Method: ' + request.method);
+            response.send("Only supports GET requests")
+        }
+    });
 
-    if (request.method === 'GET') {
-        
-        let params = request.headers['uid'];
-        let path = request.headers['path'];
-        
-        // @ts-ignore
-        admin.firestore().collection(path.toString())
-            .where('users', 'array-contains', params)
-            .get().then(groups => {
-            const listOfGroups: any = [];
-
-            groups.forEach(item => {
-                const group = item.data();
-                listOfGroups.push(group);
-            })
-            response.json(listOfGroups);
-        }).catch(err => {console.log(err)})
-    } else {
-        console.log('Method: ' + request.method);
-        response.send("Only supports GET requests")
-    }
+    
 
 });
     
