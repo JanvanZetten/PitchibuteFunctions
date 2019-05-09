@@ -35,8 +35,8 @@ function getUserByEmail(email: string) {
     return admin.auth().getUserByEmail(email);
 }
 
-function getDocument(doc: string) {
-    return admin.firestore().collection("groups").doc(doc).get();
+function getDocument(collection: string, doc: string) {
+    return admin.firestore().collection(collection).doc(doc).get();
 }
 
 exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
@@ -69,14 +69,22 @@ exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
             }).catch(error => {
                 console.log(error.message);
                 throw new CustomError('User with the email ' + email + ' was not found.', 404);
+
             });
 
-            await getDocument(doc).then(snapShot => {
+            await getDocument(collection, doc).then(snapShot => {
+                // @ts-ignore
+                if(snapShot.data().type !== 0){
+                    throw new CustomError('You tried adding user to a non-group', 403)
+                }
                 // @ts-ignore
                 users = snapShot.data().users;
             }).catch(error => {
                 console.log(error.message);
-                throw new CustomError('Invalid group', 404);
+                if(error instanceof CustomError){
+                    throw error;
+                }
+                throw new CustomError('Group not found.', 404);
             });
 
             // Checking if the one adding a user is himself apart of group.
