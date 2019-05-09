@@ -1,9 +1,9 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import {CustomError} from "./CustomError";
-import {Authorization as auth} from "./authorization";
+import {Authorization} from "./authorization";
 
-function addNewUser(collection: string, doc: string, users: []) {
+function addNewUser(collection: string, doc: string, users: string[]) {
     // Merging data.(adding new user)
     admin.firestore().collection(collection).doc(doc).set({
             users: users
@@ -16,11 +16,13 @@ function addNewUser(collection: string, doc: string, users: []) {
     });
 }
 
-function apartOfGroup(users: [], userId: string, decodedUserUid: string) {
-    // @ts-ignore
+function apartOfGroup(users: string [], userId: string, decodedUserUid: string) {
     if (users.indexOf(decodedUserUid) !== -1) {
-        // @ts-ignore
-        users.push(userId);
+        if (users.indexOf(userId) === -1) {
+            users.push(userId);
+        } else {
+            throw new CustomError('User is already in group', 400);
+        }
     } else {
         throw new CustomError('You are not authorized to do that.', 403);
     }
@@ -39,34 +41,28 @@ function getDocument(doc: string) {
 
 exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
 
-    // Checking if user has a token for auth.
-    auth.validateFirebaseIdToken(req, res);
-
+    const auth = new Authorization();
     const data = req.body;
     const email = data.email;
     const collection = data.collection;
     const doc = data.doc;
-    // @ts-ignore
-    let users: [] = [];
+    let users: string[] = [];
     let userId = '';
-    // @ts-ignore
     let decodedUserUid = '';
 
     // Check if collection, doc and email are not empty.
     if (collection && doc && email) {
         try {
-            let tokenForDecode = req.get('Authorization');
+            // Checking if user has a token for auth. And verification''
+            auth.validateFirebaseIdToken(req, res);
+            const tokenBearer = req.get('Authorization');
+
             // @ts-ignore
-            tokenForDecode = tokenForDecode.split('Bearer ')[1];
-            // Decoding the token in order to get uid.
-            // @ts-ignore
-            await auth.verifyToken(tokenForDecode)
-            // @ts-ignore
-                .then(token => {
-                    decodedUserUid = token.uid;
-                }).catch(error => {
-                    throw new CustomError('You are not authorized to do this', 401);
-                });
+            await auth.verifyToken(tokenBearer).then(token => {
+                decodedUserUid = token.uid;
+            }).catch(() => {
+                throw new CustomError('You are not authorized to do this', 401);
+            });
 
             await getUserByEmail(email).then(userData => {
                 userId = userData.uid;
