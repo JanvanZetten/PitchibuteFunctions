@@ -1,5 +1,6 @@
 import * as admin from 'firebase-admin';
 import * as uploadFile from './upload-file';
+import * as getPathItems from './getPathItems';
 import * as addUserGroup from './add-user-group'
 import * as testDownloadFile from './test-download-file';
 import * as logCreate from './log-create';
@@ -15,6 +16,7 @@ admin.initializeApp({
 
 module.exports = {
     ...uploadFile,
+    ...getPathItems,
     ...addUserGroup,
     ...testDownloadFile,
     ...uploadFile,
