@@ -16,12 +16,12 @@ exports.renameItem = functions.https.onRequest(async (req, res) => {
 
     let userRequestUid: string;
 
-    auth.validateFirebaseIdToken(req, res);
-    if (newName && collection) {
+    if (newName && collection && doc) {
         try {
+            auth.validateFirebaseIdToken(req, res);
             const collectionArray = collection.split('/');
 
-            const tokenBearer = req.get('Authorization');
+            const tokenBearer = req.headers['authorization'];
             // @ts-ignore
             await auth.verifyToken(tokenBearer).then(token => {
                 userRequestUid = token.uid;

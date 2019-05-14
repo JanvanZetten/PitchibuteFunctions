@@ -9,7 +9,7 @@ export class Authorization {
 
     validateFirebaseIdToken(req: Request, res: Response) {
         // @ts-ignore
-        if (!req.get('Authorization') || !req.get('Authorization').startsWith('Bearer ')) {
+        if (!req.headers['authorization'] || !req.headers['authorization'].startsWith('Bearer ')) {
             throw new CustomError('Missing authorization header', 400)
         }
     };

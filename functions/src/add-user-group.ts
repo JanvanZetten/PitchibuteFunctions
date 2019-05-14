@@ -22,7 +22,7 @@ exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
         try {
             // Checking if user has a token for auth. And verification''
             auth.validateFirebaseIdToken(req, res);
-            const tokenBearer = req.get('Authorization');
+            const tokenBearer = req.headers['authorization'];
 
             // @ts-ignore
             await auth.verifyToken(tokenBearer).then(token => {
