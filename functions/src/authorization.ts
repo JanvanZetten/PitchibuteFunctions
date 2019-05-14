@@ -2,7 +2,7 @@ import {Request} from "firebase-functions/lib/providers/https";
 import {Response} from "firebase-functions";
 import * as admin from "firebase-admin";
 import DecodedIdToken = admin.auth.DecodedIdToken;
-import {CustomError} from "./CustomError";
+import {CustomError} from "./custom-error";
 
 export class Authorization {
 
