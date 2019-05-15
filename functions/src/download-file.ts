@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as corsModule from 'cors';
 import { Authorization } from './authorization';
-import { CustomError } from './CustomError';
+import { CustomError } from './custom-error';
 
 const cors = corsModule({
     origin: true, exposedHeaders: ['Content-Type', 'Content-Disposition', 'Content-Length'] });
@@ -57,7 +57,7 @@ exports.downloadfile =
                                 const filemetadata = dataArr[0];
                                 console.log('UID: ' + decodedUserUid + ', contentType: ' + filemetadata.contentType + ', originalName: ' + filemetadata.metadata.originalName);
 
-                                // Convert original file name to base64 because the HTTP Headers does not support special characters as (æ, ø & å)
+                                // Convert original file name to base64 because the HTTP Headers does not support special characters as (ï¿½, ï¿½ & ï¿½)
                                 const base64FileName = Buffer.from(filemetadata.metadata.originalName).toString('base64');
                                 console.log('base64FileName: ' + base64FileName);
 

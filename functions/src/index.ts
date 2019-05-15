@@ -5,6 +5,7 @@ import * as addUserGroup from './add-user-group'
 import * as testDownloadFile from './test-download-file';
 import * as downloadFile from './download-file';
 import * as logCreate from './log-create';
+import * as renameItem from './renameItem'
 
 // Fetch the service account key JSON file contents
 const serviceAccount = require("../pitchibute-5171e0a0103b.json");
@@ -16,6 +17,7 @@ admin.initializeApp({
 });
 
 module.exports = {
+    ...renameItem,
     ...uploadFile,
     ...getPathItems,
     ...addUserGroup,
