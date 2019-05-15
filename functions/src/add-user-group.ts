@@ -21,10 +21,8 @@ exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
     if (collection && doc && email) {
         try {
             // Checking if user has a token for auth. And verification''
-            auth.validateFirebaseIdToken(req, res);
-            const tokenBearer = req.headers['authorization'];
+            const tokenBearer = auth.validateFirebaseIdToken(req);
 
-            // @ts-ignore
             await auth.verifyToken(tokenBearer).then(token => {
                 decodedUserUid = token.uid;
             }).catch(() => {
@@ -38,7 +36,7 @@ exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
                 throw new CustomError('User with the email ' + email + ' was not found.', 404);
 
             });
-
+            
             await helper.getDocument(collection, doc).then(snapShot => {
                 // @ts-ignore
                 if (snapShot.data().type !== 0) {

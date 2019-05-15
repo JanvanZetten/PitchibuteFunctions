@@ -3,6 +3,7 @@ import * as uploadFile from './upload-file';
 import * as getPathItems from './getPathItems';
 import * as addUserGroup from './add-user-group'
 import * as testDownloadFile from './test-download-file';
+import * as downloadFile from './download-file';
 import * as logCreate from './log-create';
 import * as renameItem from './renameItem'
 
@@ -22,5 +23,6 @@ module.exports = {
     ...addUserGroup,
     ...testDownloadFile,
     ...uploadFile,
+    ...downloadFile,
     ...logCreate
 };
