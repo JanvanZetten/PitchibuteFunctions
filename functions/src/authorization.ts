@@ -7,6 +7,7 @@ import {CustomError} from "./custom-error";
 export class Authorization {
 
 
+    // Renaming a
     validateFirebaseIdToken(req: Request, res: Response) {
         // @ts-ignore
         if (!req.headers['authorization'] || !req.headers['authorization'].startsWith('Bearer ')) {

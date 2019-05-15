@@ -1,8 +1,11 @@
 import * as admin from "firebase-admin";
 import {CustomError} from "../custom-error";
 
+/**This class is simply a helper class, which can be used all over - Basically so you don't have to repeat yourself.**/
+
 export class Helper {
 
+    // Adding user to collection.
     addNewUser(collection: string, doc: string, users: string[]) {
         // Merging data.(adding new user)
         admin.firestore().collection(collection).doc(doc).set({
@@ -16,6 +19,7 @@ export class Helper {
         });
     }
 
+    // Renaming item.
     renameItem(collection: string, doc: string, name: string) {
         admin.firestore().collection(collection).doc(doc).set({
                 name: name
@@ -27,10 +31,12 @@ export class Helper {
         });
     }
 
+    // Checking if a user is apart of the array.
     apartOfGroup(users: string [], userId: string): boolean {
         return users.indexOf(userId) !== -1;
     }
 
+    // Adding user to array if the one trying to add him is apart of it.
     addUserToGroupIfAuthorized(users: string [], userId: string, decodedUserUid: string) {
         if (this.apartOfGroup(users, decodedUserUid)) {
             if (users.indexOf(userId) === -1) {
@@ -43,6 +49,7 @@ export class Helper {
         }
     }
 
+    // Retrieving UID by his email
     getUserByEmail(email: string) {
 
         // Retrieving the data about the user, to get the user-id.
@@ -50,14 +57,17 @@ export class Helper {
         return admin.auth().getUserByEmail(email);
     }
 
+    // Method to get collection.
     getCollection(collection: string) {
         return admin.firestore().collection(collection).get();
     }
 
+    // Used to find a collection and specific document.
     getDocument(collection: string, doc:string) {
         return admin.firestore().collection(collection).doc(doc).get();
     }
 
+    // Namechecking if name is already the same.
     nameChecker(nameSnap: string, newName:string) {
 
         if (nameSnap === newName) {
