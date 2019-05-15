@@ -19,19 +19,23 @@ exports.renameItem = functions.https.onRequest((req, res) => {
 
         const collection = reqData.collection;
 
+        console.log('doc: ' + doc);
+        console.log('collection: ' + collection);
+
         let userRequestUid: string;
 
         if (newName && collection && doc) {
             try {
                 const tokenBearer = auth.validateFirebaseIdToken(req);
                 const collectionArray = collection.split('/');
+                console.log('collectionArr: ' + collectionArray);
 
                 await auth.verifyToken(tokenBearer).then(token => {
                     userRequestUid = token.uid;
                 }).catch(error => {
                     throw new CustomError('You are not authorized', 403);
                 });
-                await helper.getDocument(collectionArray[1], collectionArray[2])
+                await helper.getDocument(collectionArray[0], collectionArray.length > 0 && collectionArray[1] != '' ? collectionArray[1] : doc)
                     .then(snapShot => {
                         const data = snapShot.data();
                         // @ts-ignore
@@ -54,6 +58,7 @@ exports.renameItem = functions.https.onRequest((req, res) => {
                 res.send('Changed name of item')
 
             } catch (error) {
+                console.error(error);
                 if (error instanceof CustomError) {
                     res.status(error.errorStatus).send(error.message);
                 } else {
