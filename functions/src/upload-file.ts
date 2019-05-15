@@ -27,7 +27,7 @@ exports.uploadfile =
 
                 const ITEMS = 'items'
 
-                var collection = admin.firestore().collection(ITEMS)
+                let collection = admin.firestore().collection(ITEMS)
 
                 docIds.forEach(docId => {
                     if (docId !== '') {
