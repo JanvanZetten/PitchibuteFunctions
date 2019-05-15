@@ -54,7 +54,7 @@ exports.addUserToGroup = functions.https.onRequest(async (req, res) => {
     if (collection && doc && email) {
         try {
             // Checking if user has a token for auth. And verification''
-            auth.validateFirebaseIdToken(req, res);
+            auth.validateFirebaseIdToken(req);
             const tokenBearer = req.get('Authorization');
 
             // @ts-ignore
