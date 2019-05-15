@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 import * as corsModule from 'cors';
 import { Authorization } from './authorization';
 import { CustomError } from './CustomError';
+
 const cors = corsModule({
     origin: true, exposedHeaders: ['Content-Type', 'Content-Disposition', 'Content-Length'] });
 
@@ -56,11 +57,16 @@ exports.downloadfile =
                                 const filemetadata = dataArr[0];
                                 console.log('UID: ' + decodedUserUid + ', contentType: ' + filemetadata.contentType + ', originalName: ' + filemetadata.metadata.originalName);
 
+                                // Convert original file name to base64 because the HTTP Headers does not support special characters as (æ, ø & å)
+                                const base64FileName = Buffer.from(filemetadata.metadata.originalName).toString('base64');
+                                console.log('base64FileName: ' + base64FileName);
+
+
                                 // The content type and original file name is used for the HTTP Request Header.
                                 // Double quotes is used in the originalName because of spaces.
                                 response.writeHead(200, {
                                     'Content-Type': filemetadata.contentType,
-                                    'Content-Disposition': 'attachment; filename="' + filemetadata.metadata.originalName + '"'
+                                    'Content-Disposition': 'attachment; filename="' + base64FileName + '"'
                                 });
 
 
