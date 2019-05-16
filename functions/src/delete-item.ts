@@ -8,33 +8,25 @@ import * as corsModule from 'cors';
 const cors = corsModule({
     origin: true, exposedHeaders: ['Content-Type', 'Content-Disposition', 'Content-Length']
 });
-exports.renameItem = functions.https.onRequest((req, res) => {
+exports.deleteItem = functions.https.onRequest((req, res) => {
     cors(req, res, async () => {
         const helper = new Helper();
         const auth = new Authorization();
         const reqData = req.body;
-
-        const newName = reqData.name;
-        const doc = reqData.doc;
-
-        const collection = reqData.collection;
-
-        console.log('doc: ' + doc);
-        console.log('collection: ' + collection);
-
         let userRequestUid: string;
-
-        if (newName && collection && doc) {
+        const doc = reqData.doc;
+        const collection = reqData.collection;
+        if (doc && collection) {
             try {
                 const tokenBearer = auth.validateFirebaseIdToken(req);
                 const collectionArray = collection.split('/');
-                console.log('collectionArr: ' + collectionArray);
 
                 await auth.verifyToken(tokenBearer).then(token => {
                     userRequestUid = token.uid;
                 }).catch(error => {
                     throw new CustomError('You are not authorized', 403);
                 });
+
                 await helper.getDocument(collectionArray[0], collectionArray.length > 0 && collectionArray[1] !== '' ? collectionArray[1] : doc)
                     .then(snapShot => {
                         const data = snapShot.data();
@@ -43,8 +35,7 @@ exports.renameItem = functions.https.onRequest((req, res) => {
                             throw new CustomError('You are not authorized, not part of the group', 403);
                         }
                         if (collectionArray.length > 0 && collectionArray[1] === '') {
-                            // @ts-ignore
-                            helper.nameChecker(data.name, newName);
+                            throw new CustomError('You cannot delete a group', 400);
                         }
                     }).catch(error => {
                         throw error
@@ -54,25 +45,27 @@ exports.renameItem = functions.https.onRequest((req, res) => {
                     await helper.getDocument(collection, doc).then(snapShot => {
                         const data = snapShot.data();
                         // @ts-ignore
-                        helper.nameChecker(data.name, newName);
+                        if (data.type === 0) {
+                            throw new CustomError('You cannot delete a group', 400);
+                        }
                     }).catch(error => {
                         throw error
                     });
                 }
+                helper.delete(collection, doc);
+                res.status(200).send('You have successfully deleted item')
 
-                helper.renameItem(collection, doc, newName);
-                res.send('Changed name of item')
-
-            } catch (error) {
+            } catch
+                (error) {
                 console.error(error);
                 if (error instanceof CustomError) {
                     res.status(error.errorStatus).send(error.message);
                 } else {
-                    res.send('Something unexpected happened. Contact the administrator team')
+                    res.status(400).send('Something unexpected happened. Contact the administrator team')
                 }
             }
         } else {
-            res.send('Missing parameters.')
+            throw new CustomError('Missing parameters', 400);
         }
-    })
+    });
 });
