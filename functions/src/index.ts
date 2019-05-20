@@ -6,6 +6,7 @@ import * as testDownloadFile from './test-download-file';
 import * as downloadFile from './download-file';
 import * as logCreate from './log-create';
 import * as renameItem from './renameItem'
+import * as addItem from './add-item'
 
 // Fetch the service account key JSON file contents
 const serviceAccount = require("../pitchibute-5171e0a0103b.json");
@@ -24,5 +25,6 @@ module.exports = {
     ...testDownloadFile,
     ...uploadFile,
     ...downloadFile,
-    ...logCreate
+    ...logCreate,
+    ...addItem
 };
