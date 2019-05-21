@@ -112,7 +112,7 @@ exports.downloadfile =
 
                                 let base64FileName = '';
                                 // Get file document.
-                                await admin.firestore().collection(docPath).doc(fileId).get()
+                                await helper.getDocument(docPath, fileId)
                                     .then(doc => {
                                         const docData = doc.data();
                                         if (docData && docData.name) {
