@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import { Helper } from './helpers/helper';
 
 // should be the same as web apps item type.
 enum type {
@@ -11,6 +12,7 @@ enum type {
  */
 exports.uploadfile =
     functions.storage.object().onFinalize(async (object, context) => {
+        const helper = new Helper();
         console.log('Object: ' + JSON.stringify(object));
 
         let splitPath = new Array<string>();
@@ -40,7 +42,7 @@ exports.uploadfile =
 
                 if (rootItemPath !== '') {
                     console.log('Root item path: ' + rootItemPath);
-                    await admin.firestore().collection('items').doc(rootItemPath).get()
+                    await helper.getDocument('items', rootItemPath)
                         .then(doc => {
                             if (doc && doc.exists && doc.data()) {
                                 const docData = doc.data();
