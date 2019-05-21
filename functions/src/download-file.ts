@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 import * as corsModule from 'cors';
 import { Authorization } from './authorization';
 import { CustomError } from './custom-error';
+import { Helper } from './helpers/helper';
 
 const cors = corsModule({
     origin: true, exposedHeaders: ['Content-Type', 'Content-Disposition', 'Content-Length'] });
@@ -21,6 +22,7 @@ exports.downloadfile =
     .https.onRequest((request, response) => {
         cors(request, response, async () => {
             const auth = new Authorization();
+            const helper = new Helper();
             let decodedUserUid = '';
             try {
                 // Check if the request is carries an Authorization header.
@@ -66,7 +68,7 @@ exports.downloadfile =
 
                                     if (rootItemPath !== '') {
                                         console.log('Root item path: ' + rootItemPath);
-                                        await admin.firestore().collection('items').doc(rootItemPath).get()
+                                        await helper.getDocument('items', rootItemPath)
                                             .then(doc => {
                                                 if (doc && doc.exists && doc.data()) {
                                                     const docData = doc.data();
