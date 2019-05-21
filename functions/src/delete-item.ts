@@ -1,5 +1,4 @@
 import * as functions from 'firebase-functions';
-//import * as admin from 'firebase-admin';
 import {Authorization} from "./authorization";
 import {Helper} from "./helpers/helper";
 import {CustomError} from "./custom-error";
