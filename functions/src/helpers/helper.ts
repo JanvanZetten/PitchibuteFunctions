@@ -19,6 +19,15 @@ export class Helper {
         });
     }
 
+    // Delete
+    delete(collection: string, doc: string): void {
+         admin.firestore().collection(collection).doc(doc).delete().then().catch(error => {
+            console.log(error);
+            throw new CustomError('Could not delete item, contact administrator team.',
+                400);
+        });
+    }
+
     // Renaming item.
     renameItem(collection: string, doc: string, name: string) {
         admin.firestore().collection(collection).doc(doc).set({
@@ -63,15 +72,15 @@ export class Helper {
     }
 
     // Used to find a collection and specific document.
-    getDocument(collection: string, doc:string) {
+    getDocument(collection: string, doc: string) {
         return admin.firestore().collection(collection).doc(doc).get();
     }
 
     // Namechecking if name is already the same.
-    nameChecker(nameSnap: string, newName:string) {
+    nameChecker(nameSnap: string, newName: string) {
 
         if (nameSnap === newName) {
-            throw new CustomError(  'Group/Item already has that name', 400);
+            throw new CustomError('Group/Item already has that name', 400);
         }
 
     }
