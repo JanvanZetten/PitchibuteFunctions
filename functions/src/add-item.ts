@@ -24,7 +24,7 @@ exports.addItem =
                 console.log(`The token is ${idToken}`)
 
                 if (idToken === undefined) {
-                    console.log('A user has been given status 401 because the token was undifined')
+                    console.log('A user has been given status 401 because the token was undefined')
                     response.sendStatus(401)
                 }
 
