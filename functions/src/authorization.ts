@@ -10,6 +10,7 @@ export class Authorization {
     // Renaming a{
     validateFirebaseIdToken(req: Request): string {
         const authorization = req.headers['authorization'];
+        console.log(authorization);
         if (!authorization || !authorization.startsWith('Bearer ')) {
             throw new CustomError('Missing authorization header', 400)
         } else {
