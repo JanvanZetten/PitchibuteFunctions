@@ -6,6 +6,7 @@ import * as testDownloadFile from './test-download-file';
 import * as downloadFile from './download-file';
 import * as logCreate from './log-create';
 import * as renameItem from './renameItem'
+import * as addItem from './add-item'
 import * as deleteItem from './delete-item'
 
 // Fetch the service account key JSON file contents
@@ -26,5 +27,6 @@ module.exports = {
     ...testDownloadFile,
     ...uploadFile,
     ...downloadFile,
-    ...logCreate
+    ...logCreate,
+    ...addItem
 };
