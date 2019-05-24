@@ -23,32 +23,27 @@ exports.getPathItems = functions.https.onRequest((request, response) => {
 
                 await auth.verifyToken(tokenBearer).then(token => {
                     userRequestUid = token.uid;
+                    console.log(userRequestUid);
+                    // @ts-ignore
+                    console.log(path[0].toString())
                 }).catch(error => {
                     throw new CustomError('You are not authorized', 403);
                 });
 
                 // @ts-ignore
-                await helper.getCollection(path[0]).then(async snapShot => {
+                await helper.getCollection(path[0].toString()).get().then(items => {
+                    const listOfItems: any = [];
                     // @ts-ignore
-                    const data = snapShot.data();
-                    // @ts-ignore
-                    await admin.firestore().collection(path.toString())
-                        /*.where('users', 'array-contains', userRequestUid)*/
-                        .get().then(items => {
-                            const listOfItems: any = [];
-                            items.forEach(item => {
-                                if (helper.apartOfGroup(data.users, userRequestUid)) {
-                                    const i = {
-                                        id: item.id,
-                                        ...item.data()
-                                    };
-                                    listOfItems.push(i);
-                                }
-                            });
-                            response.json(listOfItems);
-                        }).catch(err => {
-                            console.log(err)
-                        })
+                    items.forEach(item => {
+                        if (helper.apartOfGroup(item.users, userRequestUid)) {
+                            const i = {
+                                id: item.id,
+                                ...item.data()
+                            };
+                            listOfItems.push(i);
+                        }
+                    });
+                    response.json(listOfItems);
                 });
             } catch (error) {
                 console.log(error);
